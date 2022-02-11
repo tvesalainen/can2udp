@@ -38,16 +38,20 @@
 #include "udp.h"
 #include "loop.h"
 
+int verbose = 0;
+
 int main(int argc, char **argv)
 {
 	int c;
-	char* canbus;
-	char* address;
-	int udpport;
+	char* canbus = NULL;
+	char* address = NULL;
+	struct sockaddr_in saddr;
+	int udpport = -1;
 	int cansocket;
 	int udpsocket;
+	int use_stderr = 1;
 
-	while ((c = getopt (argc, argv, "a:vb:p:")) != -1)
+	while ((c = getopt (argc, argv, "a:vb:p:s")) != -1)
 	{
 		switch (c)
 		{
@@ -63,10 +67,31 @@ int main(int argc, char **argv)
 			case 'p':
 				udpport = atoi(optarg);
 			break;
+			case 's':
+				use_stderr = 0;
+			break;
 			default:
 				fprintf(stderr, "usage:xxx\n");
 				exit(-1);
 		}
+	}
+	if (use_stderr)
+	{
+		openlog(NULL, LOG_PERROR, LOG_USER);
+	}
+	else
+	{
+		openlog(NULL, 0, LOG_USER);
+	}
+	if (address == NULL || canbus == NULL || udpport == -1)
+	{
+		fprintf(stderr, "usage: \n"
+				"\t-v\t\tverbose\n"
+				"\t-a <address>\taddress\n"
+				"\t-b <canbus>\tcan bus\n"
+				"\t-s \t\tlog only to syslog\n"
+			);
+		exit(-1);
 	}
 	VERBOSE("can bus  = %s\n", canbus);
 	VERBOSE("address  = %s\n", address);
@@ -75,16 +100,21 @@ int main(int argc, char **argv)
 	cansocket = open_can(canbus);	
 	if (cansocket < 0)
 	{
-		perror("open can");
+		ERROR("%m: open can");
 		exit(-1);
 	}
-	udpsocket = open_udp(address, udpport);	
+	if (get_address(&saddr, address, udpport) < 0)
+	{
+		ERROR("%m: get_address");
+		exit(-1);
+	}
+	udpsocket = open_udp(&saddr, address, udpport);	
 	if (udpsocket < 0)
 	{
-		perror("open udp");
+		ERROR("%m: open udp");
 		exit(-1);
 	}
 
-	loop(cansocket, udpsocket);
+	loop(&saddr, cansocket, udpsocket);
 }
 

@@ -18,9 +18,13 @@
 #ifndef _CAN2UDP_H
 #define _CAN2UDP_H
 
+#include <syslog.h>
 
-int verbose = 0;
+int fastprefix(int b, int c);
+
+extern int verbose;
 
 #define VERBOSE(...) if (verbose) fprintf(stderr, __VA_ARGS__)
+#define ERROR(...)  syslog(LOG_USER|LOG_ERR, __VA_ARGS__)
 
 #endif /* _CAN2UDP_H */

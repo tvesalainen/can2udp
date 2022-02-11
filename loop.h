@@ -22,6 +22,6 @@
 #include <linux/socket.h>
 
 
-int loop(int cansocket, int udpsocket);
+int loop(struct sockaddr_in *saddr, int cansocket, int udpsocket);
 
 #endif /* _LOOP_H */

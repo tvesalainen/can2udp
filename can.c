@@ -3,6 +3,8 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <linux/can.h>
+
+#include "can2udp.h"
 #include "can.h"
 
 int open_can(char * bus)
@@ -14,11 +16,13 @@ int open_can(char * bus)
 	s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 	if (s < 0)
 	{
+		ERROR("%m: socket can");
 		return -1;
 	}
 	strcpy(ifr.ifr_name, bus );
 	if (ioctl(s, SIOCGIFINDEX, &ifr) < 0)
 	{
+		ERROR("%m: ioctl can");
 		return -1;
 	}
 
@@ -27,6 +31,7 @@ int open_can(char * bus)
 
 	if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0)
 	{
+		ERROR("%m: bind can");
 		return -1;
 	}
 
