@@ -20,8 +20,6 @@
 
 #include <syslog.h>
 
-int fastprefix(int b, int c);
-
 extern int verbose;
 
 #define VERBOSE(...) if (verbose) fprintf(stderr, __VA_ARGS__)

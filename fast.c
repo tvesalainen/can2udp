@@ -1,15 +1,85 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <linux/can.h>
 
+#include "can2udp.h"
 #include "j1939.h"
 #include "fast.h"
 
-int fast = 0;
-int id = 0xff;
-int seq;
-int left = 0;
+struct fast_data* sources[MAX_FAST];
 
+int handle_fast(struct can_frame *frame, int forward, struct sockaddr_in *addr)
+{
+	struct fast_data *fast;
+	char buf[230];
+	int id;
+	int seq;
+
+	if (is_fast(frame->can_id))
+	{
+		int sa = SA(frame->can_id);
+		fast = sources[sa];
+		if (fast == NULL)
+		{
+			fast = calloc(1, sizeof(struct fast_data));
+			fast->id = 0xff;
+			sources[sa] = fast;
+		}	
+		id = ID(frame->data[0]);
+		seq = SEQ(frame->data[0]);
+		if (id != fast->id)
+		{
+			if (seq == 0)
+			{
+				fast->pgn = PGN(frame->can_id);
+				fast->id = id;
+				fast->msg.type = 0xf;
+				fast->msg.can_id[0] = frame->can_id>>24;
+				fast->msg.can_id[1] = frame->can_id>>16;
+				fast->msg.can_id[2] = frame->can_id>>8;
+				fast->msg.can_id[3] = frame->can_id;
+				fast->msg.len = frame->data[1];
+				memcpy(fast->msg.data, frame->data+2, 6);
+				fast->cnt = 6;
+			}
+		}
+		else
+		{
+			memcpy(fast->msg.data+6+(seq-1)*7, frame->data+1, 7);
+			fast->cnt += 7;
+			
+		}
+		if (fast->cnt >= fast->msg.len)
+		{
+			if (sendto(forward, &(fast->msg), fast->msg.len+6, 0, (struct sockaddr*)addr, sizeof(struct sockaddr_in)) < 0)
+			{
+				ERROR("%m: write udp");
+				return -1;
+			}
+		}
+	}
+	else
+	{
+		buf[0] = 0;
+		buf[1] = frame->can_id>>24;
+		buf[2] = frame->can_id>>16;
+		buf[3] = frame->can_id>>8;
+		buf[4] = frame->can_id;
+		buf[5] = frame->can_dlc;
+		memcpy(buf+6, frame->data, frame->can_dlc);
+		if (sendto(forward, buf, frame->can_dlc+6, 0, (struct sockaddr*)addr, sizeof(struct sockaddr_in)) < 0)
+		{
+			ERROR("%m: write udp");
+			return -1;
+		}
+	}
+	return 0;
+}
 int is_fast(int can_id)
 {
 	switch (PGN(can_id))
@@ -46,45 +116,5 @@ int is_fast(int can_id)
 			return 1;
 		default:
 			return 0;
-	}
-}
-void fastprefix(int canId, int b, int c)
-{
-	int s;
-	int i;
-
-	s = b & 0x1f;
-	i = b & 0xe0;
-	if (i != id)
-	{
-		if (s == 0)
-		{
-			fast = canId;
-			id = i;
-			seq = 0;
-			left = c - 6;
-		}
-		else
-		{
-			fast = 0;
-			id = 0xff;
-		}
-	}
-	else
-	{
-		if (fast == canId)
-		{
-			left = left - 7;
-			if (s != seq + 1)
-			{
-				if (seq > 2 && left > 0)
-				{
-					fprintf(stderr, "missing packet left=%d\n", left);
-				}
-				fast = 0;
-				id = 0xff;
-			}
-			seq = s;
-		}
 	}
 }

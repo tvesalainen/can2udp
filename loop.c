@@ -17,6 +17,7 @@
 #include <linux/can.h>
 
 #include "can2udp.h"
+#include "fast.h"
 #include "loop.h"
 
 #define MAX(i, j) ((i>j)?i:j)
@@ -46,18 +47,9 @@ int loop(struct sockaddr_in *saddr, int cansocket, int udpsocket)
 				ERROR("%m: read can");
 				return -1;
 			}
-			fastprefix(frame.data[0], frame.data[1]);
-			VERBOSE("can: id %x len %d %x %x %x %x %x %x %x %x\n", frame.can_id, frame.can_dlc, frame.data[0], frame.data[1], frame.data[2], frame.data[3], frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
-			buf[0] = 0;
-			buf[1] = frame.can_id>>24;
-			buf[2] = frame.can_id>>16;
-			buf[3] = frame.can_id>>8;
-			buf[4] = frame.can_id;
-			buf[5] = frame.can_dlc;
-			memcpy(buf+6, frame.data, frame.can_dlc);
-			if (sendto(udpsocket, buf, frame.can_dlc+6, 0, (struct sockaddr*)saddr, sizeof(struct sockaddr_in)) < 0)
+			if (handle_fast(&frame, udpsocket, saddr) < 0)
 			{
-				ERROR("%m: write udp");
+				ERROR("%m: handle_fast");
 				return -1;
 			}
 		}
