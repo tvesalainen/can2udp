@@ -27,7 +27,7 @@ int loop(struct sockaddr_in *saddr, int cansocket, int udpsocket)
 	fd_set readfds;
 	int nf = MAX(cansocket, udpsocket)+1;
 	struct can_frame frame;
-	char buf[14];
+	struct udp_msg msg;
 
 	FD_ZERO(&readfds);
 
@@ -47,34 +47,23 @@ int loop(struct sockaddr_in *saddr, int cansocket, int udpsocket)
 				ERROR("%m: read can");
 				return -1;
 			}
-			if (handle_fast(&frame, udpsocket, saddr) < 0)
+			if (can2udp(&frame, udpsocket, saddr) < 0)
 			{
-				ERROR("%m: handle_fast");
+				ERROR("%m: can -> udp");
 				return -1;
 			}
 		}
 		if(FD_ISSET(udpsocket, &readfds))
 		{
-			if (recvfrom(udpsocket, buf, sizeof(buf), 0, NULL, NULL) < 0)
+			if (recvfrom(udpsocket, &msg, sizeof(msg), 0, NULL, NULL) < 0)
 			{
 				ERROR("%m: read udp");
 				return -1;
 			}
-			if (buf[0] == 0)
+			if (udp2can(&msg, cansocket) < 0)
 			{
-				frame.can_id = buf[1]<<24|buf[2]<<16|buf[3]<<8|buf[4];
-				frame.can_dlc = buf[5];
-				VERBOSE("udp: id %x len %d %x %x %x %x %x %x %x %x\n", frame.can_id, frame.can_dlc, frame.data[0], frame.data[1], frame.data[2], frame.data[3], frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
-				memcpy(frame.data, buf+6, frame.can_dlc);
-				if (write(cansocket, &frame, sizeof(struct can_frame)) < 0)
-				{
-					ERROR("%m: write can");
-					return -1;
-				}
-			}
-			else
-			{
-				VERBOSE("wrong version %d\n", buf[0]);
+				ERROR("%m: udp -> can");
+				return -1;
 			}
 		}
 	}

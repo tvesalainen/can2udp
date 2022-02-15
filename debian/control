@@ -1,0 +1,11 @@
+Source: can2udp  
+Maintainer: Timo Vesalainen <timo.vesalainen@iki.fi>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 4.3.0
+Section: utils
+
+Package: can2udp  
+Priority: extra  
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}  
+Description: Tunnels can frames to multicast net.
