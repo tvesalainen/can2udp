@@ -1,0 +1,6 @@
+#! /bin/sh
+#
+update-rc.d can2udp defaults
+service can2udp restart
+
+

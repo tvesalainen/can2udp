@@ -1,0 +1,5 @@
+#! /bin/sh
+#
+update-rc.d can2udp remove
+service can2udp stop
+
