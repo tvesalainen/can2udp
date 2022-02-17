@@ -87,7 +87,8 @@ int main(int argc, char **argv)
 	{
 		fprintf(stderr, "usage: \n"
 				"\t-v\t\tverbose\n"
-				"\t-a <address>\taddress\n"
+				"\t-a <address>\tmulticast address\n"
+				"\t-p <port>\tmulticast port\n"
 				"\t-b <canbus>\tcan bus\n"
 				"\t-s \t\tlog only to syslog\n"
 			);
