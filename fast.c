@@ -63,7 +63,7 @@ int udp2can(struct udp_msg *msg, int forward)
 			else
 			{
 				frame.data[0] = id|seq;
-				memcpy(frame.data+1, &(msg->data)+6+(seq-1)*7, 7);
+				memcpy(frame.data+1, (char*)&(msg->data)+6+(seq-1)*7, 7);
 				if (write(forward, &frame, sizeof(struct can_frame)) < 0)
 				{
 					ERROR("%m: write can");
