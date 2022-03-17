@@ -1,8 +1,8 @@
 #! /bin/sh
 ### BEGIN INIT INFO
 # Provides:          can2udp
-# Required-Start:    $network $syslog
-# Required-Stop:     $network $syslog
+# Required-Start:    $local_fs $network $syslog can
+# Required-Stop:     $local_fs $network $syslog can
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: can2udp
@@ -10,6 +10,8 @@
 #                    
 ### END INIT INFO
 
+# Depends on can! If other than /etc/init.d/can initializes can-bus
+# edit!
 #
 # RUN: update-rc.d can2udp defaults
 # 
