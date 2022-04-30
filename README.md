@@ -34,8 +34,9 @@ sudo dpkg -i ../can2udp_0.1_XXXXX.deb
 ```
 
 Note! Debian installing starts service can2udp with default settings. 
-Stop it with ``service can2udp stop`` and edit /etc/default/can2udp. 
-After that run ``service can2udp start``.
+Stop it with ``systemctl stop can2udp`` and edit with command
+´``systemctl edit can2udp``. 
+After that run ``systemctl start can2udp``.
 
 Note! Receiving NMEA 2000 fast packet from udp generates max 32 writes to can bus.
 With default can setting ``txqueuelen 10`` it will crash.
