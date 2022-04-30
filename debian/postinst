@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-update-rc.d can2udp defaults
-service can2udp restart
+systemctl enable can2udp
+systemctl start can2udp
 
 

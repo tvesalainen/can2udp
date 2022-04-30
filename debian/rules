@@ -3,7 +3,6 @@
 	dh $@
 
 override_dh_auto_install:
-	install -D -m 0755 etcdefault $$(pwd)/debian/can2udp/etc/default/can2udp
-	install -D -m 0755 etcinitd $$(pwd)/debian/can2udp/etc/init.d/can2udp
+	install -D -m 0655 can2udp.service $$(pwd)/debian/can2udp/etc/systemd/system/can2udp.service
 	install -D -m 0755 can2udp $$(pwd)/debian/can2udp/usr/bin/can2udp
 

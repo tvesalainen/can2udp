@@ -1,5 +1,5 @@
 #! /bin/sh
 #
-update-rc.d can2udp remove
-service can2udp stop
+systemctl stop can2udp
+systemctl disable can2udp
 

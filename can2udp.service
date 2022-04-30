@@ -1,0 +1,15 @@
+[Unit]
+Description=Can to UDP gateway
+After=can
+After=network.target
+
+[Service]
+Type=simple
+Environment=CAN_BUS=can1
+Environment=MULTICAST_ADDR=224.0.0.3
+Environment=MULTICAST_PORT=11111
+ExecStart=/usr/bin/can2udp -s -b $CAN_BUS -a $MULTICAST_ADDR -p $MULTICAST_PORT
+
+[Install]
+WantedBy=multi-user.target
+
