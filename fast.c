@@ -211,6 +211,7 @@ int is_fast(int can_id)
 		case 129044:
 		case 126996:
 		case 126998:
+		case 129802:
 			return 1;
 		default:
 			return 0;
