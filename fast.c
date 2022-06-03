@@ -182,36 +182,36 @@ int is_fast(int can_id)
 {
 	switch (PGN(can_id))
 	{
-		case 127489:
-		case 126464:
 		case 126208:
-		case 129795:
-		case 129794:
-		case 129797:
-		case 129029:
-		case 129285:
-		case 127237:
-		case 129540:
-		case 129796:
-		case 129284:
-		case 127497:
-		case 127496:
-		case 127498:
-		case 129039:
-		case 127503:
-		case 129038:
-		case 129041:
-		case 129809:
-		case 130320:
-		case 129040:
-		case 128275:
-		case 130578:
-		case 129810:
-		case 129045:
-		case 129044:
+		case 126464:
 		case 126996:
 		case 126998:
+		case 127489:
+		case 127496:
+		case 127497:
+		case 127498:
+		case 127503:
+		case 128275:
+		case 129029:
+		case 129038:
+		case 129039:
+		case 129040:
+		case 129041:
+		case 129044:
+		case 129045:
+		case 127237:
+		case 129284:
+		case 129285:
+		case 129540:
+		case 129794:
+		case 129795:
+		case 129796:
+		case 129797:
 		case 129802:
+		case 129809:
+		case 129810:
+		case 130320:
+		case 130578:
 			return 1;
 		default:
 			return 0;
