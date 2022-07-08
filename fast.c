@@ -191,6 +191,7 @@ int is_fast(int can_id)
 		case 127497:
 		case 127498:
 		case 127503:
+		case 127506:
 		case 128275:
 		case 129029:
 		case 129038:
